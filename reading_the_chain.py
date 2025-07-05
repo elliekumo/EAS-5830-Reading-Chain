@@ -98,7 +98,7 @@ def is_ordered_block(w3, block_num):
 	# Check is the priority_fees are in non-ascending order
 	ordered = True
 	for i in range(len(priority_fees) - 1):
-		if priority_fees[i] < priority_fees [i + 1]:
+		if priority_fees[i] <= priority_fees [i + 1]:
 			ordered = False
 			break
 
