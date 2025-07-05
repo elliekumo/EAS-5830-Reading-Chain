@@ -64,6 +64,7 @@ def is_ordered_block(w3, block_num):
 
 	for tx in block.transactions:
 		tx_type = tx.get("type", "0x0")     # default to legacy if missing
+		effective_priority = 0 # always define it
 
 		if tx_type == "0x2":     # EIP-1559 type 2
 			max_priority = tx.get("maxPriorityFeePerGas")
