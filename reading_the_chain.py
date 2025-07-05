@@ -59,7 +59,7 @@ def is_ordered_block(w3, block_num):
 	Conveniently, most type 2 transactions set the gasPrice field to be min( tx.maxPriorityFeePerGas + block.baseFeePerGas, tx.maxFeePerGas )
 	"""
 	block = w3.eth.get_block(block_num, full_transactions=True)
-	base_fee = block.get("baseFeePerGas", 0)
+	base_fee = block.get("baseFeePerGas", None)
 	priority_fees = []
 
 	for tx in block.transactions:
@@ -74,16 +74,14 @@ def is_ordered_block(w3, block_num):
 			if max_priority is not None and max_fee is not None and base_fee is not None:
 				# priority fee = min(maxPriorityFeePerGas, maxFeePerGas - baseFeePerGas)
 				calculated_priority = max_fee - base_fee
-				if max_priority < calculated_priority:
-					effective_priority = max_priority
-				else:
-					effective_priority = calculated_priority
+				effective_priority = min(max_priority, calculated_priority)
 			else:
 				effective_priority = tx.get("gasPrice", 0)
 
 		elif tx_type == "0x0" or tx_type is None:     # EIP-1559 type 0
 			gas_price = tx.get("gasPrice", 0)
 
+			# only subtract base fee if it actually exists
 			if "baseFeePerGas" in block and base_fee is not None:
 				effective_priority = gas_price - base_fee
 			else:
@@ -98,7 +96,7 @@ def is_ordered_block(w3, block_num):
 	# Check is the priority_fees are in non-ascending order
 	ordered = True
 	for i in range(len(priority_fees) - 1):
-		if priority_fees[i] < priority_fees [i + 1]:
+		if priority_fees[i] <= priority_fees [i + 1]:
 			ordered = False
 			break
 
