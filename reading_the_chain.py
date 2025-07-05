@@ -84,7 +84,7 @@ def is_ordered_block(w3, block_num):
 		elif tx_type == "0x0" or tx_type is None:     # EIP-1559 type 0
 			gas_price = tx.get("gasPrice", 0)
 
-			if base_fee is not None:
+			if "baseFeePerGas" in block and base_fee is not None:
 				effective_priority = gas_price - base_fee
 			else:
 				effective_priority = gas_price
