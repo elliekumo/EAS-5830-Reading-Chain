@@ -94,13 +94,14 @@ def is_ordered_block(w3, block_num):
 		priority_fees.append(effective_priority)
 
 	# Check is the priority_fees are in non-ascending order
-	ordered = True
+	#ordered = True
 	for i in range(len(priority_fees) - 1):
 		if priority_fees[i] < priority_fees [i + 1]:
-			ordered = False
-			break
-
-	return ordered
+			#ordered = False
+			#break
+			return False
+	return True
+	#return ordered
 
 
 def get_contract_values(contract, admin_address, owner_address):
