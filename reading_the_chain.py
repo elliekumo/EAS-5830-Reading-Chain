@@ -63,8 +63,8 @@ def is_ordered_block(w3, block_num):
 	priority_fees = []
 
 	for tx in block.transactions:
-		tx_type = tx.get("type", "0x0")     # default to legacy if missing
-		effective_priority = 0 # always define it
+		tx_type = tx.get("type", "0x0")     # default to type 0 if missing
+		effective_priority = 0              # always define it
 
 		if tx_type == "0x2":     # EIP-1559 type 2
 			max_priority = tx.get("maxPriorityFeePerGas")
@@ -76,6 +76,7 @@ def is_ordered_block(w3, block_num):
 				calculated_priority = max_fee - base_fee
 				effective_priority = min(max_priority, calculated_priority)
 			else:
+				# use gasPrice if EIP-1559 fields are missing
 				effective_priority = tx.get("gasPrice", 0)
 
 		elif tx_type == "0x0" or tx_type is None:     # EIP-1559 type 0
@@ -88,18 +89,18 @@ def is_ordered_block(w3, block_num):
 				effective_priority = gas_price
 
 		else:
-			# unknown or unsupported type
+			# use gasPrice for unknown or unsupported type
 			effective_priority = tx.get("gasPrice", 0)
 
 		priority_fees.append(effective_priority)
 
-	# Check is the priority_fees are in non-ascending order
-
+	# Check is the priority_fees are in non-increasing order
+	ordered = True
 	for i in range(len(priority_fees) - 1):
 		if priority_fees[i] < priority_fees [i + 1]:
-			return False
+			ordered = False
 
-	return True
+	return ordered
 
 
 
